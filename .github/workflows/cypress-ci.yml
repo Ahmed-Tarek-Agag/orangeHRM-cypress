@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write  # 🔥 ضروري للنشر على gh-pages
+  contents: write
 
 jobs:
   cypress-tests:
@@ -27,18 +27,15 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      # ✅ Clean old reports
+      # 🔹 Clean old reports
       - name: Clean old reports
         run: |
           rm -rf cypress/reports allure-report allure-results
+          mkdir -p cypress/reports allure-report
 
-      # ✅ Run Cypress tests
+      # 🔹 Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -46,7 +43,7 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # ✅ Generate Mochawesome Report
+      # 🔹 Generate Mochawesome Report
       - name: Generate Mochawesome Report
         if: always()
         run: |
@@ -57,7 +54,7 @@ jobs:
             echo "No JSON files to merge"
           fi
 
-      # ✅ Generate Allure Report
+      # 🔹 Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -67,52 +64,36 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # ✅ Upload artifacts (reports, screenshots, videos)
-      - name: Upload Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cypress-Artifacts
-          path: |
-            cypress/reports
-            allure-report
-            cypress/screenshots
-            cypress/videos
-
-      # ✅ Show Passed & Failed tests
-      - name: Show Passed and Failed Tests
-        if: always()
-        run: |
-          if [ -f "cypress/reports/output.json" ]; then
-            echo "========== TEST SUMMARY =========="
-            echo "✅ Passed Tests:"
-            jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"' cypress/reports/output.json
-            echo ""
-            echo "❌ Failed Tests:"
-            jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"' cypress/reports/output.json
-            echo "=================================="
-          else
-            echo "No test results found"
-          fi
-
-      # ✅ Deploy Mochawesome Report to GitHub Pages
+      # 🔹 Deploy Mochawesome
       - name: Deploy Mochawesome to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: cypress/reports
+          publish_dir: ./cypress/reports
           publish_branch: gh-pages
+          user_name: 'github-actions'
+          user_email: 'github-actions@github.com'
 
-      # ✅ Print clickable Report URL
-      - name: Print Mochawesome Report URL
+      # 🔹 Deploy Allure
+      - name: Deploy Allure to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          publish_branch: gh-pages
+          user_name: 'github-actions'
+          user_email: 'github-actions@github.com'
+          destination_dir: allure  # حتى يكون رابط مختلف عن Mochawesome
+
+      # 🔹 Print report URLs
+      - name: Print report URLs
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          REPORT_URL="https://${USER_NAME}.github.io/${REPO_NAME}/index.html"
           echo "=============================================="
-          echo "🎯 Mochawesome Report URL: $REPORT_URL"
-          # Creates a clickable notice in Actions logs
-          echo "::notice file=README.md::[Open Mochawesome Report]($REPORT_URL)"
+          echo "🎯 Mochawesome Report: https://${USER_NAME}.github.io/${REPO_NAME}/"
+          echo "🎯 Allure Report:     https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
           echo "=============================================="
