@@ -1,2 +1,6 @@
 node_modules
 cypress.env.json
+allure-results
+reports
+screenshots
+videos

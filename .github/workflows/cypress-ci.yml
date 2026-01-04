@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write   
+  contents: write   # مهم للـ gh-pages
 
 jobs:
   cypress-tests:
@@ -18,27 +18,34 @@ jobs:
       CYPRESS_PASSWORD: ${{ secrets.CYPRESS_PASSWORD }}
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Node.js 20
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # 4️⃣ Install jq for JSON parsing
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      # ✅ Clean old reports (Mochawesome + Allure)
+      # 5️⃣ Clean old reports (Mochawesome & Allure)
       - name: Clean old reports
         run: |
-          rm -rf cypress/reports allure-results allure-report cypress/screenshots cypress/videos
-          mkdir -p cypress/reports allure-results allure-report cypress/screenshots cypress/videos
+          rm -rf cypress/reports output.json allure-report allure-results
 
-      # ✅ Run Cypress Tests
+      # 6️⃣ Prepare folders
+      - name: Prepare folders
+        run: mkdir -p cypress/reports allure-report
+
+      # 7️⃣ Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -46,18 +53,18 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # ✅ Generate Mochawesome Report
+      # 8️⃣ Generate Mochawesome Report
       - name: Generate Mochawesome Report
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
             npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
-            npx marge cypress/reports/output.json --reportFilename index --reportDir cypress/reports
+            npx marge cypress/reports/output.json -f index -o cypress/reports
           else
             echo "No JSON files to merge"
           fi
 
-      # ✅ Generate Allure Report
+      # 9️⃣ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -67,7 +74,7 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # ✅ Upload Artifacts
+      # 🔟 Upload Artifacts
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -79,7 +86,7 @@ jobs:
             cypress/screenshots
             cypress/videos
 
-      # ✅ Show Passed & Failed Tests in Logs
+      # 1️⃣1️⃣ Show Passed & Failed Tests
       - name: Show Passed and Failed Tests
         if: always()
         run: |
@@ -95,7 +102,7 @@ jobs:
             echo "No test results found"
           fi
 
-      # ✅ Deploy Mochawesome Report to GitHub Pages
+      # 1️⃣2️⃣ Deploy Mochawesome Report to GitHub Pages
       - name: Deploy Mochawesome to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -103,10 +110,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: cypress/reports
           publish_branch: gh-pages
-          user_name: github-actions
-          user_email: github-actions@github.com
 
-      # ✅ Print Report URL
+      # 1️⃣3️⃣ Print Report URL
       - name: Print Mochawesome Report URL
         if: always()
         run: |
