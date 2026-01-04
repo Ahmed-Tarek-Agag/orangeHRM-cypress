@@ -7,23 +7,21 @@ module.exports = defineConfig({
     baseUrl: 'https://opensource-demo.orangehrmlive.com/',
 
     setupNodeEvents(on, config) {
-      // Allure plugin
+      // 🔹 Allure Plugin
       allureWriter(on, config);
 
-      // Clean Allure before run
+      // 🔹 Clean old reports before each run
       on("before:run", async () => {
-        console.log("Cleaning old Allure reports...");
-        await fs.remove("allure-report");
-        await fs.remove("allure-results");
-
-        console.log("Cleaning old Mochawesome reports...");
-        await fs.remove("cypress/reports");
+        console.log("Cleaning old Mochawesome and Allure reports...");
+        await fs.remove("cypress/reports");     // remove old Mochawesome reports
+        await fs.remove("allure-report");       // remove old Allure reports
+        await fs.remove("allure-results");      // remove old Allure results
       });
 
-      // Mochawesome plugin
+      // 🔹 Mochawesome Reporter Plugin
       require('cypress-mochawesome-reporter/plugin')(on);
 
-      // Environment variables
+      // 🔹 Environment variables
       config.env.username = process.env.CYPRESS_USERNAME;
       config.env.password = process.env.CYPRESS_PASSWORD;
 
@@ -31,12 +29,17 @@ module.exports = defineConfig({
     },
   },
 
+  // 🔹 General settings
   video: true,
+  viewportWidth: 1280,
+  viewportHeight: 720,
+
+  // 🔹 Reporter configuration
   reporter: 'cypress-mochawesome-reporter',
   reporterOptions: {
     reportDir: "cypress/reports",
     charts: true,
-    overwrite: true, // overwrite old files
+    overwrite: true,       // overwrite old Mochawesome report
     html: false,
     json: true,
     quiet: true
@@ -44,8 +47,5 @@ module.exports = defineConfig({
 
   env: {
     allure: true
-  },
-
-  viewportWidth: 1280,
-  viewportHeight: 720
+  }
 });

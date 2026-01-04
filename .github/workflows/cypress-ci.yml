@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: write  # 🔥 ضروري للنشر على gh-pages
 
 jobs:
   cypress-tests:
@@ -18,27 +18,27 @@ jobs:
       CYPRESS_PASSWORD: ${{ secrets.CYPRESS_PASSWORD }}
 
     steps:
-      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22 
+          node-version: 20
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
 
-      # 4️⃣ Prepare folders & clean old reports
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # ✅ Clean old reports
       - name: Clean old reports
         run: |
           rm -rf cypress/reports allure-report allure-results
-          mkdir -p cypress/reports allure-report
 
-      # 5️⃣ Run Cypress Tests
+      # ✅ Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -46,18 +46,18 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # 6️⃣ Generate Mochawesome Report
+      # ✅ Generate Mochawesome Report
       - name: Generate Mochawesome Report
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
             npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
-            npx marge cypress/reports/output.json -f report -o cypress/reports
+            npx marge cypress/reports/output.json -f index -o cypress/reports
           else
             echo "No JSON files to merge"
           fi
 
-      # 7️⃣ Generate Allure Report
+      # ✅ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -67,7 +67,7 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # 8️⃣ Upload Artifacts
+      # ✅ Upload artifacts (reports, screenshots, videos)
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -79,7 +79,23 @@ jobs:
             cypress/screenshots
             cypress/videos
 
-      # 9️⃣ Deploy Mochawesome Report to GitHub Pages
+      # ✅ Show Passed & Failed tests
+      - name: Show Passed and Failed Tests
+        if: always()
+        run: |
+          if [ -f "cypress/reports/output.json" ]; then
+            echo "========== TEST SUMMARY =========="
+            echo "✅ Passed Tests:"
+            jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"' cypress/reports/output.json
+            echo ""
+            echo "❌ Failed Tests:"
+            jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"' cypress/reports/output.json
+            echo "=================================="
+          else
+            echo "No test results found"
+          fi
+
+      # ✅ Deploy Mochawesome Report to GitHub Pages
       - name: Deploy Mochawesome to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -88,13 +104,15 @@ jobs:
           publish_dir: cypress/reports
           publish_branch: gh-pages
 
-      # 🔟 Print Report URL
+      # ✅ Print clickable Report URL
       - name: Print Mochawesome Report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
+          REPORT_URL="https://${USER_NAME}.github.io/${REPO_NAME}/index.html"
           echo "=============================================="
-          echo "🎯 Mochawesome Report:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/report.html"
+          echo "🎯 Mochawesome Report URL: $REPORT_URL"
+          # Creates a clickable notice in Actions logs
+          echo "::notice file=README.md::[Open Mochawesome Report]($REPORT_URL)"
           echo "=============================================="
