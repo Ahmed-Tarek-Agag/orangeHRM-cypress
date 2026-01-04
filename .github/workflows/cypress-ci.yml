@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write   # مهم جدًا لـ gh-pages
+  contents: write
 
 jobs:
   cypress-tests:
@@ -18,32 +18,27 @@ jobs:
       CYPRESS_PASSWORD: ${{ secrets.CYPRESS_PASSWORD }}
 
     steps:
-      # -------------------------
-      # Checkout Repo & Setup Node
-      # -------------------------
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20  # Node >=20 مناسب لكل الحزم
+          node-version: 22 
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      # 4️⃣ Prepare folders & clean old reports
+      - name: Clean old reports
+        run: |
+          rm -rf cypress/reports allure-report allure-results
+          mkdir -p cypress/reports allure-report
 
-      # -------------------------
-      # Install Allure CLI Globally
-      # -------------------------
-      - name: Install Allure CLI
-        run: npm install -g allure-commandline@2.36.0 --unsafe-perm=true
-
-      # -------------------------
-      # Run Cypress Tests
-      # -------------------------
+      # 5️⃣ Run Cypress Tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -51,17 +46,7 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # -------------------------
-      # Prepare folders (clean old reports)
-      # -------------------------
-      - name: Clean old reports
-        run: |
-          rm -rf cypress/reports allure-report allure-results
-          mkdir -p cypress/reports allure-report
-
-      # -------------------------
-      # Generate Mochawesome Report
-      # -------------------------
+      # 6️⃣ Generate Mochawesome Report
       - name: Generate Mochawesome Report
         if: always()
         run: |
@@ -72,21 +57,17 @@ jobs:
             echo "No JSON files to merge"
           fi
 
-      # -------------------------
-      # Generate Allure Report
-      # -------------------------
+      # 7️⃣ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-            allure generate allure-results --clean -o allure-report
+            npx allure generate allure-results --clean -o allure-report
           else
             echo "No Allure results found"
           fi
 
-      # -------------------------
-      # Upload Artifacts
-      # -------------------------
+      # 8️⃣ Upload Artifacts
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -98,27 +79,7 @@ jobs:
             cypress/screenshots
             cypress/videos
 
-      # -------------------------
-      # Show Passed & Failed Tests in Logs
-      # -------------------------
-      - name: Show Passed & Failed Tests
-        if: always()
-        run: |
-          if [ -f "cypress/reports/output.json" ]; then
-            echo "========== TEST SUMMARY =========="
-            echo "✅ Passed Tests:"
-            jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"' cypress/reports/output.json
-            echo ""
-            echo "❌ Failed Tests:"
-            jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"' cypress/reports/output.json
-            echo "=================================="
-          else
-            echo "No test results found"
-          fi
-
-      # -------------------------
-      # Deploy Mochawesome to GitHub Pages
-      # -------------------------
+      # 9️⃣ Deploy Mochawesome Report to GitHub Pages
       - name: Deploy Mochawesome to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -127,15 +88,12 @@ jobs:
           publish_dir: cypress/reports
           publish_branch: gh-pages
 
-      # -------------------------
-      # Print Report URL
-      # -------------------------
+      # 🔟 Print Report URL
       - name: Print Mochawesome Report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-
           echo "=============================================="
           echo "🎯 Mochawesome Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/report.html"
