@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ✅ Run Cypress Tests (continue even if some fail)
+      # ✅ Run Cypress Tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -36,7 +36,7 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # ✅ Prepare folders to avoid warnings
+      # ✅ Prepare folders
       - name: Prepare folders
         run: mkdir -p cypress/reports cypress/screenshots allure-report
 
@@ -61,58 +61,20 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # ✅ Upload Mochawesome Report
-      - name: Upload Mochawesome Report
+      # ✅ Upload artifacts
+      - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Cypress-Mochawesome-Report
-          path: cypress/reports
+          name: Cypress-Artifacts
+          path: |
+            cypress/reports
+            allure-report
+            cypress/screenshots
+            cypress/videos
 
-      # ✅ Upload Allure Report
-      - name: Upload Allure Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cypress-Allure-Report
-          path: allure-report
-
-      # ✅ Check and Upload Cypress Screenshots
-      - name: Check Screenshots
-        if: always()
-        run: |
-          if compgen -G "cypress/screenshots/*" > /dev/null; then
-            echo "Screenshots exist"
-          else
-            echo "No screenshots found"
-          fi
-
-      - name: Upload Cypress Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cypress-Screenshots
-          path: cypress/screenshots
-
-      # ✅ Check and Upload Cypress Videos
-      - name: Check Videos
-        if: always()
-        run: |
-          if compgen -G "cypress/videos/*" > /dev/null; then
-            echo "Videos exist"
-          else
-            echo "No videos found"
-          fi
-
-      - name: Upload Cypress Videos
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Cypress-Videos
-          path: cypress/videos
-
-      # ✅ Show Passed and Failed Tests in GitHub Actions log
-      - name: Show Passed and Failed Tests on GitHub Actions
+      # ✅ Show Passed and Failed Tests
+      - name: Show Passed and Failed Tests
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
@@ -127,3 +89,28 @@ jobs:
           else
             echo "No test results found"
           fi
+
+      # ✅ Deploy Mochawesome Report to GitHub Pages
+      - name: Deploy Mochawesome to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cypress/reports
+          publish_branch: gh-pages
+          user_name: 'github-actions'
+          user_email: 'github-actions@github.com'
+
+      # ✅ Print Direct URL to Mochawesome Report for this run
+      - name: Print Direct URL to Mochawesome Report
+        if: always()
+        run: |
+          # Extract username and repo
+          USER_NAME=${GITHUB_REPOSITORY%%/*}
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          # Report URL
+          REPORT_URL="https://${USER_NAME}.github.io/${REPO_NAME}/report.html"
+          echo "=============================================="
+          echo "🎯 Open Mochawesome Report directly in browser:"
+          echo "${REPORT_URL}"
+          echo "=============================================="
