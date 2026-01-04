@@ -85,6 +85,8 @@ jobs:
             echo "Screenshots exist"
           else
             echo "No screenshots found"
+          fi
+
       - name: Upload Cypress Screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -100,6 +102,8 @@ jobs:
             echo "Videos exist"
           else
             echo "No videos found"
+          fi
+
       - name: Upload Cypress Videos
         if: always()
         uses: actions/upload-artifact@v4
