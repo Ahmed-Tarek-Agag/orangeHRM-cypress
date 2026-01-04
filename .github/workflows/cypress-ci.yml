@@ -2,14 +2,13 @@ name: OrangeHRM Cypress CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
+
 permissions:
-  contents: read
-  
+  contents: write   # 🔥 مهم جدًا لـ gh-pages
+
 jobs:
   cypress-tests:
     runs-on: ubuntu-latest
@@ -30,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       # ✅ Run Cypress Tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
@@ -40,7 +42,7 @@ jobs:
 
       # ✅ Prepare folders
       - name: Prepare folders
-        run: mkdir -p cypress/reports cypress/screenshots allure-report
+        run: mkdir -p cypress/reports allure-report
 
       # ✅ Generate Mochawesome Report
       - name: Generate Mochawesome Report
@@ -63,7 +65,7 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # ✅ Upload artifacts
+      # ✅ Upload Artifacts
       - name: Upload Artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -75,18 +77,17 @@ jobs:
             cypress/screenshots
             cypress/videos
 
-      # ✅ Show Passed and Failed Tests
+      # ✅ Show Passed & Failed Tests in Logs
       - name: Show Passed and Failed Tests
         if: always()
         run: |
-          if compgen -G "cypress/reports/*.json" > /dev/null; then
-            npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+          if [ -f "cypress/reports/output.json" ]; then
             echo "========== TEST SUMMARY =========="
             echo "✅ Passed Tests:"
-            cat cypress/reports/output.json | jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"'
+            jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"' cypress/reports/output.json
             echo ""
             echo "❌ Failed Tests:"
-            cat cypress/reports/output.json | jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"'
+            jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"' cypress/reports/output.json
             echo "=================================="
           else
             echo "No test results found"
@@ -98,21 +99,16 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./cypress/reports
+          publish_dir: cypress/reports
           publish_branch: gh-pages
-          user_name: 'github-actions'
-          user_email: 'github-actions@github.com'
 
-      # ✅ Print Direct URL to Mochawesome Report for this run
-      - name: Print Direct URL to Mochawesome Report
+      # ✅ Print Report URL
+      - name: Print Mochawesome Report URL
         if: always()
         run: |
-          # Extract username and repo
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          # Report URL
-          REPORT_URL="https://${USER_NAME}.github.io/${REPO_NAME}/report.html"
           echo "=============================================="
-          echo "🎯 Open Mochawesome Report directly in browser:"
-          echo "${REPORT_URL}"
+          echo "🎯 Mochawesome Report:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/report.html"
           echo "=============================================="
