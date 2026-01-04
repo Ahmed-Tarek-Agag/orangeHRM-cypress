@@ -2,13 +2,7 @@ const { defineConfig } = require("cypress");
 const allureWriter = require("@shelex/cypress-allure-plugin/writer");
 
 module.exports = defineConfig({
-  reporter: "mochawesome",
-  reporterOptions: {
-    reportDir: "cypress/reports",
-    overwrite: false,
-    html: false,
-    json: true
-  },
+
   e2e: {
     baseUrl: 'https://opensource-demo.orangehrmlive.com/',
 
@@ -20,10 +14,18 @@ module.exports = defineConfig({
       // implement node event listeners here
     },
   },
+  video: true,
+  reporter: "mochawesome",
+  reporterOptions: {
+    reportDir: "cypress/reports",
+    overwrite: false,
+    html: false,
+    json: true
+  },
   env: {
     allure: true
   },
-  video: false,
+
   viewportWidth: 1280,
   viewportHeight: 720
 });
