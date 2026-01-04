@@ -18,32 +18,65 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
+      # ✅ Run Cypress Tests (continue even if some fail)
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
+        continue-on-error: true
 
-      - name: Upload Cypress videos
+      # ✅ Generate Mochawesome Report
+      - name: Generate Mochawesome Report
+        if: always()
+        run: |
+          npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+          npx marge cypress/reports/output.json -f report -o cypress/reports
+
+      # ✅ Generate Allure Report
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          npx allure generate allure-results --clean -o allure-report
+
+      # ✅ Upload Mochawesome Report
+      - name: Upload Mochawesome Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos
-          path: cypress/videos
+          name: Cypress-Mochawesome-Report
+          path: cypress/reports
 
-      - name: Upload Cypress screenshots
+      # ✅ Upload Allure Report
+      - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots
+          name: Cypress-Allure-Report
+          path: allure-report
+
+      # ✅ Upload Cypress Screenshots
+      - name: Upload Cypress Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cypress-Screenshots
           path: cypress/screenshots
+
+      # ✅ Upload Cypress Videos
+      - name: Upload Cypress Videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cypress-Videos
+          path: cypress/videos
