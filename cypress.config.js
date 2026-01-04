@@ -8,6 +8,7 @@ module.exports = defineConfig({
 
     setupNodeEvents(on, config) {
       allureWriter(on, config);
+      require('cypress-mochawesome-reporter/plugin')(on);
       config.env.username = process.env.CYPRESS_USERNAME;
       config.env.password = process.env.CYPRESS_PASSWORD;
       return config;

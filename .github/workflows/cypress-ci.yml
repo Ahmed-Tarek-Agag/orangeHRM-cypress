@@ -36,9 +36,9 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # ✅ Prepare reports folder
-      - name: Prepare Mochawesome reports folder
-        run: mkdir -p cypress/reports
+      # ✅ Prepare folders to avoid warnings
+      - name: Prepare folders
+        run: mkdir -p cypress/reports cypress/screenshots allure-report
 
       # ✅ Generate Mochawesome Report
       - name: Generate Mochawesome Report
@@ -55,8 +55,7 @@ jobs:
       - name: Generate Allure Report
         if: always()
         run: |
-          mkdir -p allure-report
-          if [ -d "allure-results" ]; then
+          if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
             npx allure generate allure-results --clean -o allure-report
           else
             echo "No Allure results found"
@@ -78,7 +77,14 @@ jobs:
           name: Cypress-Allure-Report
           path: allure-report
 
-      # ✅ Upload Cypress Screenshots
+      # ✅ Check and Upload Cypress Screenshots
+      - name: Check Screenshots
+        if: always()
+        run: |
+          if compgen -G "cypress/screenshots/*" > /dev/null; then
+            echo "Screenshots exist"
+          else
+            echo "No screenshots found"
       - name: Upload Cypress Screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -86,10 +92,34 @@ jobs:
           name: Cypress-Screenshots
           path: cypress/screenshots
 
-      # ✅ Upload Cypress Videos
+      # ✅ Check and Upload Cypress Videos
+      - name: Check Videos
+        if: always()
+        run: |
+          if compgen -G "cypress/videos/*" > /dev/null; then
+            echo "Videos exist"
+          else
+            echo "No videos found"
       - name: Upload Cypress Videos
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Cypress-Videos
           path: cypress/videos
+
+      # ✅ Show Passed and Failed Tests in GitHub Actions log
+      - name: Show Passed and Failed Tests on GitHub Actions
+        if: always()
+        run: |
+          if compgen -G "cypress/reports/*.json" > /dev/null; then
+            npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+            echo "========== TEST SUMMARY =========="
+            echo "✅ Passed Tests:"
+            cat cypress/reports/output.json | jq -r '.results[].suites[].tests[] | select(.state=="passed") | "  - \(.fullTitle)"'
+            echo ""
+            echo "❌ Failed Tests:"
+            cat cypress/reports/output.json | jq -r '.results[].suites[].tests[] | select(.state=="failed") | "  - \(.fullTitle)"'
+            echo "=================================="
+          else
+            echo "No test results found"
+          fi
