@@ -9,6 +9,7 @@ class loginPage {
         this.elements.usernameInput().type(username);
         this.elements.passwordInput().type(password);
         this.elements.loginButton().click();
+        cy.url().should('include', '/dashboard');
     }
 }
 
