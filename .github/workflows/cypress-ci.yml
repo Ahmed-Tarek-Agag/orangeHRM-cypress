@@ -18,21 +18,18 @@ jobs:
       CYPRESS_PASSWORD: ${{ secrets.CYPRESS_PASSWORD }}
 
     steps:
-      # ✅ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # ✅ Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # ✅ Clean old reports
+      # Clean old reports
       - name: Clean old reports
         run: |
           rm -rf reports
@@ -40,7 +37,7 @@ jobs:
           rm -rf allure-report allure-results
           mkdir -p reports/mochawesome reports/allure
 
-      # ✅ Run Cypress tests
+      # Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -48,24 +45,26 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # ✅ List JSON reports (debug)
-      - name: List Cypress JSON reports
-        run: ls -l cypress/reports/
-
-      # ✅ Generate Mochawesome Report
-      - name: Generate Mochawesome Report
-        if: always()
+      # Check if JSON reports exist
+      - name: Check Cypress JSON Reports
+        id: check-json
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
-            npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
-            npx marge cypress/reports/output.json \
-              -o reports/mochawesome \
-              -f index
+            echo "reports_exist=true" >> $GITHUB_ENV
           else
-            echo "No JSON files to merge"
+            echo "reports_exist=false" >> $GITHUB_ENV
           fi
 
-      # ✅ Generate Allure Report
+      # Generate Mochawesome Report only if JSON exists
+      - name: Generate Mochawesome Report
+        if: env.reports_exist == 'true'
+        run: |
+          npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+          npx marge cypress/reports/output.json \
+            -o reports/mochawesome \
+            -f index
+
+      # Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -75,12 +74,11 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # ✅ Create Landing Page
+      # Create Landing Page dynamically
       - name: Create Landing Page
         if: always()
         run: |
-          cat <<EOF > reports/index.html
-          <!DOCTYPE html>
+          echo "<!DOCTYPE html>
           <html>
           <head>
             <title>Test Reports</title>
@@ -90,33 +88,41 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>🚀 Cypress Test Reports</h1>
-            <a href="./mochawesome/index.html">📊 Mochawesome Report</a>
-            <a href="./allure/index.html">✨ Allure Report</a>
-          </body>
-          </html>
-          EOF
+            <h1>🚀 Cypress Test Reports</h1>" > reports/index.html
 
-      # ✅ Deploy Reports to GitHub Pages
+          if [ -d "reports/mochawesome" ]; then
+            echo '<a href="./mochawesome/index.html">📊 Mochawesome Report</a>' >> reports/index.html
+          fi
+
+          if [ -d "reports/allure" ]; then
+            echo '<a href="./allure/index.html">✨ Allure Report</a>' >> reports/index.html
+          fi
+
+          echo "</body></html>" >> reports/index.html
+
+      # Deploy to GitHub Pages
       - name: Deploy Reports to GitHub Pages
-        if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # ✅ Print Report URLs
-      - name: Print report URLs
+      # Print report URLs
+      - name: Print Report URLs
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
 
           echo "=============================================="
-          echo "🎯 Cypress Test Reports URLs"
+          echo "🎯 Test Reports URLs"
           echo ""
-          echo "📊 Mochawesome Report: https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/index.html"
-          echo "✨ Allure Report: https://${USER_NAME}.github.io/${REPO_NAME}/allure/index.html"
+          if [ -d "reports/mochawesome" ]; then
+            echo "📊 Mochawesome Report: https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/index.html"
+          fi
+          if [ -d "reports/allure" ]; then
+            echo "✨ Allure Report: https://${USER_NAME}.github.io/${REPO_NAME}/allure/index.html"
+          fi
           echo "🏠 Landing Page: https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
