@@ -1,0 +1,1 @@
+{"67afeadc2768a387bf908eb3b344380f":{"statistic":{"failed":1,"broken":0,"skipped":0,"passed":0,"unknown":0,"total":1},"items":[{"uid":"27737d40a2bffbfa","status":"failed","statusDetails":"Timed out retrying after 4000ms: Expected to find element: `[placeholder=\"Username\"]`, but never found it.","time":{"start":1767609976641,"stop":1767609992035,"duration":15394}}]}}
