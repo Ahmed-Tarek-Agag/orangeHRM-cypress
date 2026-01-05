@@ -111,9 +111,6 @@ jobs:
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
           echo ""
           echo "📊 Mochawesome Report:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/"
-          echo ""
-          echo "🏠 Landing Page:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
+          echo "http://localhost:52330/cypress/reports/index.html"
           echo "=============================================="
 
