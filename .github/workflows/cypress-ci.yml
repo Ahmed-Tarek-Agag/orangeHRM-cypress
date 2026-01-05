@@ -29,11 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports
+      # 🔹 Clean old Allure reports
       - name: Clean old reports
-        run: |
-          npm run cypress:clean
-          mkdir -p reports/allure
+        run: npm run cypress:clean
 
       # 🔹 Run Cypress tests
       - name: Run Cypress tests
@@ -59,18 +57,16 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./reports
+          publish_dir: ./allure-report
           publish_branch: gh-pages
 
       # 🔹 Print Report URL
-      - name: Print report URL
+      - name: Print Allure Report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-
           echo "=============================================="
-          echo "🎯 Test Report URL:"
-          echo "✨ Allure Report:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
+          echo "✨ Allure Report URL:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="

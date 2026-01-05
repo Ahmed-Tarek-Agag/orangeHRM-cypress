@@ -16,4 +16,12 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import '@shelex/cypress-allure-plugin';
-import 'cypress-mochawesome-reporter/register';
+const allureWriter = require('@shelex/cypress-allure-plugin/writer');
+
+module.exports = (on, config) => {
+  
+  allureWriter(on, config);
+
+
+  return config;
+};

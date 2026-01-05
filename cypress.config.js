@@ -10,10 +10,11 @@ module.exports = defineConfig({
       // 🔹 Allure Plugin
       allureWriter(on, config);
 
-      // 🔹 Clean old reports before each run
+      // 🔹 Clean old Allure reports before each run
       on("before:run", async () => {
         console.log("Cleaning old Allure reports...");
-        await fs.remove("allure-results");      // remove old Allure results
+        await fs.remove("allure-report");
+        await fs.remove("allure-results");
       });
 
       // 🔹 Environment variables
@@ -24,7 +25,6 @@ module.exports = defineConfig({
     },
   },
 
-  // 🔹 General settings
   video: true,
   viewportWidth: 1280,
   viewportHeight: 720,
