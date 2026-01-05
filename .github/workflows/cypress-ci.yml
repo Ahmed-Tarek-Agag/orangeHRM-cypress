@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports (SAFE)
+      # 🔹 Clean old reports
       - name: Clean old reports
         run: |
           npm run cypress:clean
@@ -48,31 +48,10 @@ jobs:
         if: always()
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-              npm run allure:generate
+            npm run allure:generate
           else
-              echo "No Allure results found"
+            echo "No Allure results found"
           fi
-
-      # 🔹 Create Landing index.html
-      - name: Create main index.html
-        if: always()
-        run: |
-          cat <<EOF > reports/index.html
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>Cypress Test Reports</title>
-            <style>
-              body { font-family: Arial; text-align: center; margin-top: 50px; }
-              a { display: block; margin: 20px; font-size: 20px; text-decoration: none; }
-            </style>
-          </head>
-          <body>
-            <h1>🚀 Cypress Test Reports</h1>
-            <a href="./allure/index.html">✨ Allure Report</a>
-          </body>
-          </html>
-          EOF
 
       # 🔹 Deploy Reports to GitHub Pages
       - name: Deploy Reports to GitHub Pages
@@ -91,9 +70,7 @@ jobs:
           REPO_NAME=${GITHUB_REPOSITORY#*/}
 
           echo "=============================================="
-          echo "🎯 Test Report URL"
+          echo "🎯 Test Report URL:"
           echo "✨ Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
-          echo "🏠 Landing Page:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="

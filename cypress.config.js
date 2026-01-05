@@ -10,11 +10,10 @@ module.exports = defineConfig({
       // 🔹 Allure Plugin
       allureWriter(on, config);
 
-      // 🔹 Clean old Allure reports before each run
+      // 🔹 Clean old reports before each run
       on("before:run", async () => {
         console.log("Cleaning old Allure reports...");
-        await fs.remove("allure-report");   // remove old Allure reports
-        await fs.remove("allure-results");  // remove old Allure results
+        await fs.remove("allure-results");      // remove old Allure results
       });
 
       // 🔹 Environment variables
