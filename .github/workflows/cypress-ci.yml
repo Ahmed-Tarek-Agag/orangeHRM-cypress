@@ -29,32 +29,33 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports (SAFE)
+      # 🔹 Clean old Allure reports
       - name: Clean old reports
         run: |
           npm run cypress:clean
           mkdir -p reports/allure
 
-      # 🔹 Run Cypress tests
+      # 🔹 Run Cypress tests (job fails if test fails)
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
-        # ❌ إزالة continue-on-error عشان أي فشل يوقف الـ job
-        continue-on-error: false
+        # ❌ احذف continue-on-error عشان أي فشل يوقف الـ job
 
       # 🔹 Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-              npm run allure:generate
+            npm run allure:generate
+            # انقلها في مجلد reports/allure
+            mv allure-report/* reports/allure/
           else
-              echo "No Allure results found"
+            echo "No Allure results found"
           fi
 
-      # 🔹 Create Landing index.html
+      # 🔹 Create main landing page
       - name: Create main index.html
         if: always()
         run: |
@@ -84,19 +85,13 @@ jobs:
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # 🔹 Print Report URLs
-      - name: Print report URLs
+      # 🔹 Print Report URL
+      - name: Print report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-
           echo "=============================================="
-          echo "🎯 Test Reports URLs"
-          echo ""
-          echo "✨ Allure Report:"
+          echo "🎯 Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
-          echo ""
-          echo "🏠 Landing Page:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
