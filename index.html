@@ -1,34 +1,14 @@
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>Allure Report</title>
-    <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <link rel="stylesheet" type="text/css" href="plugin/screen-diff/styles.css">
+  <title>Cypress Test Reports</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    a { display: block; margin: 20px; font-size: 20px; text-decoration: none; }
+  </style>
 </head>
 <body>
-    <div id="alert"></div>
-    <div id="content">
-        <span class="spinner">
-            <span class="spinner__circle"></span>
-        </span>
-    </div>
-    <div id="popup"></div>
-    <script src="app.js"></script>
-    <script src="plugin/behaviors/index.js"></script>
-    <script src="plugin/packages/index.js"></script>
-    <script src="plugin/screen-diff/index.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FVWC4GKEYS"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-FVWC4GKEYS', {
-          'allureVersion': '2.36.0',
-          'reportUuid': 'f9707de2-4f34-4644-8999-a30e5de90ad3',
-          'single_file': false
-        });
-    </script>
+  <h1>🚀 Cypress Test Reports</h1>
+  <a href="./allure/index.html">✨ Allure Report</a>
 </body>
 </html>
