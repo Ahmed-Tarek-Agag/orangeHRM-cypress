@@ -50,10 +50,13 @@ jobs:
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
-            npx mochawesome-merge cypress/reports/*.json > reports/mochawesome/output.json
-            npx marge reports/mochawesome/output.json -o reports/mochawesome -f index
+              mkdir -p reports/mochawesome
+              npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+              npx marge cypress/reports/output.json \
+              -o reports/mochawesome \
+              -f index
           else
-            echo "No Mochawesome JSON files found"
+            echo "No JSON files to merge"
           fi
 
       # 🔹 Generate Allure Report
@@ -111,6 +114,9 @@ jobs:
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
           echo ""
           echo "📊 Mochawesome Report:"
-          echo "http://localhost:52330/cypress/reports/index.html"
+          echo https://ahmed-tarek-agag.github.io/orangeHRM-cypress/mochawesome/
+          echo ""
+          echo "🏠 Landing Page:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
 
