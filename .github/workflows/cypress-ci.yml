@@ -18,18 +18,21 @@ jobs:
       CYPRESS_PASSWORD: ${{ secrets.CYPRESS_PASSWORD }}
 
     steps:
+      # ✅ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ✅ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # ✅ Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports (SAFE)
+      # ✅ Clean old reports
       - name: Clean old reports
         run: |
           rm -rf reports
@@ -37,7 +40,7 @@ jobs:
           rm -rf allure-report allure-results
           mkdir -p reports/mochawesome reports/allure
 
-      # 🔹 Run Cypress tests
+      # ✅ Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
@@ -45,21 +48,24 @@ jobs:
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
 
-      # 🔹 Generate Mochawesome Report
+      # ✅ List JSON reports (debug)
+      - name: List Cypress JSON reports
+        run: ls -l cypress/reports/
+
+      # ✅ Generate Mochawesome Report
       - name: Generate Mochawesome Report
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
-              mkdir -p reports/mochawesome
-              npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
-              npx marge cypress/reports/output.json \
+            npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
+            npx marge cypress/reports/output.json \
               -o reports/mochawesome \
               -f index
           else
             echo "No JSON files to merge"
           fi
 
-      # 🔹 Generate Allure Report
+      # ✅ Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -69,8 +75,8 @@ jobs:
             echo "No Allure results found"
           fi
 
-      # 🔹 Create Landing index.html
-      - name: Create main index.html
+      # ✅ Create Landing Page
+      - name: Create Landing Page
         if: always()
         run: |
           cat <<EOF > reports/index.html
@@ -80,7 +86,7 @@ jobs:
             <title>Test Reports</title>
             <style>
               body { font-family: Arial; text-align: center; margin-top: 50px; }
-              a { display: block; margin: 20px; font-size: 20px; }
+              a { display: block; margin: 20px; font-size: 20px; text-decoration: none; color: #333; }
             </style>
           </head>
           <body>
@@ -91,7 +97,7 @@ jobs:
           </html>
           EOF
 
-      # 🔹 Deploy to GitHub Pages
+      # ✅ Deploy Reports to GitHub Pages
       - name: Deploy Reports to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -100,7 +106,7 @@ jobs:
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # 🔹 Print Report URLs
+      # ✅ Print Report URLs
       - name: Print report URLs
         if: always()
         run: |
@@ -108,15 +114,9 @@ jobs:
           REPO_NAME=${GITHUB_REPOSITORY#*/}
 
           echo "=============================================="
-          echo "🎯 Test Reports URLs"
+          echo "🎯 Cypress Test Reports URLs"
           echo ""
-          echo "✨ Allure Report:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
-          echo ""
-          echo "📊 Mochawesome Report:"
-          echo https://ahmed-tarek-agag.github.io/orangeHRM-cypress/mochawesome/
-          echo ""
-          echo "🏠 Landing Page:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
+          echo "📊 Mochawesome Report: https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/index.html"
+          echo "✨ Allure Report: https://${USER_NAME}.github.io/${REPO_NAME}/allure/index.html"
+          echo "🏠 Landing Page: https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
-
