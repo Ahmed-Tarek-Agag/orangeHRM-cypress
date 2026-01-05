@@ -97,13 +97,23 @@ jobs:
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # 🔹 Print Report URL
-      - name: Print report URL
+      # 🔹 Print Report URLs
+      - name: Print report URLs
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
+
           echo "=============================================="
-          echo "🎯 Open Reports:"
+          echo "🎯 Test Reports URLs"
+          echo ""
+          echo "✨ Allure Report:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
+          echo ""
+          echo "📊 Mochawesome Report:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/"
+          echo ""
+          echo "🏠 Landing Page:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
+
