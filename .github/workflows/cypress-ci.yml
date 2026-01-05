@@ -29,11 +29,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports
+      # 🔹 Clean old reports (SAFE)
       - name: Clean old reports
         run: |
           rm -rf reports
-          mkdir -p reports
+          rm -rf cypress/reports
+          rm -rf allure-report allure-results
+          mkdir -p reports/mochawesome reports/allure
 
       # 🔹 Run Cypress tests
       - name: Run Cypress tests
@@ -48,29 +50,45 @@ jobs:
         if: always()
         run: |
           if compgen -G "cypress/reports/*.json" > /dev/null; then
-            npx mochawesome-merge cypress/reports/*.json > cypress/reports/output.json
-            npx marge cypress/reports/output.json -f report -o reports
+            npx mochawesome-merge cypress/reports/*.json > reports/mochawesome/output.json
+            npx marge reports/mochawesome/output.json -o reports/mochawesome -f index
           else
-            echo "No JSON files to merge"
+            echo "No Mochawesome JSON files found"
           fi
 
-      - name: Upload Mochawesome Report
-        uses: actions/upload-artifact@v4
-        with:
-            name: mochawesome-report
-            path: cypress/reports
-
-      # 🔹 Generate Allure Report in same folder
+      # 🔹 Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
-            npx allure generate allure-results --clean -o reports
+            npx allure generate allure-results --clean -o reports/allure
           else
             echo "No Allure results found"
           fi
 
-      # 🔹 Deploy combined reports to GitHub Pages
+      # 🔹 Create Landing index.html
+      - name: Create main index.html
+        if: always()
+        run: |
+          cat <<EOF > reports/index.html
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Test Reports</title>
+            <style>
+              body { font-family: Arial; text-align: center; margin-top: 50px; }
+              a { display: block; margin: 20px; font-size: 20px; }
+            </style>
+          </head>
+          <body>
+            <h1>🚀 Cypress Test Reports</h1>
+            <a href="./mochawesome/index.html">📊 Mochawesome Report</a>
+            <a href="./allure/index.html">✨ Allure Report</a>
+          </body>
+          </html>
+          EOF
+
+      # 🔹 Deploy to GitHub Pages
       - name: Deploy Reports to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -78,15 +96,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./reports
           publish_branch: gh-pages
-          user_name: 'github-actions'
-          user_email: 'github-actions@github.com'
 
-      # 🔹 Print single report URL
+      # 🔹 Print Report URL
       - name: Print report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
           echo "=============================================="
-          echo "🎯 Open combined Report: https://${USER_NAME}.github.io/${REPO_NAME}/"
+          echo "🎯 Open Reports:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
