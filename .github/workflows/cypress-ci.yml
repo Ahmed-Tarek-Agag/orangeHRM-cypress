@@ -54,6 +54,12 @@ jobs:
             echo "No JSON files to merge"
           fi
 
+      - name: Upload Mochawesome Report
+        uses: actions/upload-artifact@v4
+        with:
+            name: mochawesome-report
+            path: cypress/reports
+
       # 🔹 Generate Allure Report in same folder
       - name: Generate Allure Report
         if: always()
