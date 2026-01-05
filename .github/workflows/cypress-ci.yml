@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports
+      # 🔹 Clean old reports (SAFE)
       - name: Clean old reports
         run: |
           npm run cypress:clean
@@ -41,7 +41,8 @@ jobs:
         with:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
-       
+        # ❌ إزالة continue-on-error عشان أي فشل يوقف الـ job
+        continue-on-error: false
 
       # 🔹 Generate Allure Report
       - name: Generate Allure Report
@@ -53,7 +54,7 @@ jobs:
               echo "No Allure results found"
           fi
 
-      # 🔹 Create main index.html
+      # 🔹 Create Landing index.html
       - name: Create main index.html
         if: always()
         run: |
@@ -83,16 +84,19 @@ jobs:
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # 🔹 Print Report URL
-      - name: Print report URL
+      # 🔹 Print Report URLs
+      - name: Print report URLs
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
+
           echo "=============================================="
-          echo "🎯 Test Reports URL"
+          echo "🎯 Test Reports URLs"
+          echo ""
           echo "✨ Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
+          echo ""
           echo "🏠 Landing Page:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="
