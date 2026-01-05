@@ -29,11 +29,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old reports
+      # 🔹 Clean old reports (SAFE)
       - name: Clean old reports
         run: |
           npm run cypress:clean
-          mkdir -p reports/mochawesome reports/allure
+          mkdir -p reports/allure
 
       # 🔹 Run Cypress tests
       - name: Run Cypress tests
@@ -42,17 +42,6 @@ jobs:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
         continue-on-error: true
-
-      # 🔹 Generate Mochawesome Report
-      - name: Generate Mochawesome Report
-        if: always()
-        run: |
-          if compgen -G "cypress/reports/*.json" > /dev/null; then
-              npm run report:merge
-              npm run report:generate
-          else
-              echo "No JSON files to merge"
-          fi
 
       # 🔹 Generate Allure Report
       - name: Generate Allure Report
@@ -80,7 +69,6 @@ jobs:
           </head>
           <body>
             <h1>🚀 Cypress Test Reports</h1>
-            <a href="./mochawesome/index.html">📊 Mochawesome Report</a>
             <a href="./allure/index.html">✨ Allure Report</a>
           </body>
           </html>
@@ -95,22 +83,17 @@ jobs:
           publish_dir: ./reports
           publish_branch: gh-pages
 
-      # 🔹 Print Report URLs
-      - name: Print report URLs
+      # 🔹 Print Report URL
+      - name: Print report URL
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
 
           echo "=============================================="
-          echo "🎯 Test Reports URLs"
-          echo ""
-          echo "📊 Mochawesome Report:"
-          echo "https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/"
-          echo ""
+          echo "🎯 Test Report URL"
           echo "✨ Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
-          echo ""
           echo "🏠 Landing Page:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/"
           echo "=============================================="

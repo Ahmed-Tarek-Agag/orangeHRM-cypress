@@ -10,16 +10,12 @@ module.exports = defineConfig({
       // 🔹 Allure Plugin
       allureWriter(on, config);
 
-      // 🔹 Clean old reports before each run
+      // 🔹 Clean old Allure reports before each run
       on("before:run", async () => {
-        console.log("Cleaning old Mochawesome and Allure reports...");
-        await fs.remove("cypress/reports");     // remove old Mochawesome reports
-        await fs.remove("allure-report");       // remove old Allure reports
-        await fs.remove("allure-results");      // remove old Allure results
+        console.log("Cleaning old Allure reports...");
+        await fs.remove("allure-report");   // remove old Allure reports
+        await fs.remove("allure-results");  // remove old Allure results
       });
-
-      // 🔹 Mochawesome Reporter Plugin
-      require('cypress-mochawesome-reporter/plugin')(on);
 
       // 🔹 Environment variables
       config.env.username = process.env.CYPRESS_USERNAME;
@@ -33,17 +29,6 @@ module.exports = defineConfig({
   video: true,
   viewportWidth: 1280,
   viewportHeight: 720,
-
-  // 🔹 Reporter configuration
-  reporter: 'cypress-mochawesome-reporter',
-  reporterOptions: {
-    reportDir: "cypress/reports",
-    charts: true,
-    overwrite: true,       // overwrite old Mochawesome report
-    html: false,
-    json: true,
-    quiet: true
-  },
 
   env: {
     allure: true
