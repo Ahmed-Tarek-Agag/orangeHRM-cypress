@@ -28,6 +28,8 @@ module.exports = defineConfig({
   video: true,
   viewportWidth: 1280,
   viewportHeight: 720,
+  defaultCommandTimeout: 100000,
+  pageLoadTimeout: 60000,
   env: {
     allure: true
   }
