@@ -46,17 +46,15 @@ jobs:
       - name: Generate Allure Report
         if: always()
         run: |
+          rm -rf reports/allure
+          mkdir -p reports/allure
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
             echo "Generating Allure Report..."
             npm run allure:generate
-            rm -rf reports/allure
-            mkdir -p reports/allure
-            mv allure-report reports/allure
+            mv allure-report/* reports/allure/ 2>/dev/null || echo "⚠️ No files generated"
             echo "✅ Allure Report generated successfully."
           else
             echo "⚠️ No Allure results found. Skipping report generation."
-            rm -rf reports/allure
-            mkdir -p reports/allure
           fi
 
       # 🔹 Prepare publish folder safely
@@ -69,7 +67,7 @@ jobs:
             cp -r reports/allure/* publish/allure/
             echo "✅ Allure reports copied successfully."
           else
-            echo "⚠️ No Allure reports to copy."
+            echo "⚠️ No Allure reports to copy. Folder created empty."
           fi
           cat <<EOF > publish/index.html
           <!DOCTYPE html>
