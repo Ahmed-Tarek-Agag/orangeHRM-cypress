@@ -97,7 +97,7 @@ describe('PIM Users Management', () => {
     });
 
 
-    it.only('Should add a new employee and create login details', () => {
+    it('Should add a new employee and create login details', () => {
         onNavigationToPages.navigateToPimPage();
 
         onAddEmployeePage.fillEmployeeDetails(
@@ -283,7 +283,7 @@ describe('PIM Users Management', () => {
         onGeneralMethods.deleteAddedRecord();
     });
 
-    it.only('Should navigate to Salary and add salary details', () => {
+    it('Should navigate to Salary and add salary details', () => {
         cy.visit(routesHelper.salary(employeeNumber), { failOnStatusCode: false });
         onSalaryPage.addSalaryDetails(
             salaryComponent,
