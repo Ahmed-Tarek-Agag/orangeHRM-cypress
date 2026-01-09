@@ -42,25 +42,35 @@ jobs:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
 
-      # 🔹 Generate Allure Report
+      # 🔹 Generate Allure Report safely
       - name: Generate Allure Report
         if: always()
         run: |
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
+            echo "Generating Allure Report..."
             npm run allure:generate
-            # انقلها في مجلد reports/allure
+            rm -rf reports/allure
+            mkdir -p reports/allure
             mv allure-report reports/allure
+            echo "✅ Allure Report generated successfully."
           else
-            echo "No Allure results found"
+            echo "⚠️ No Allure results found. Skipping report generation."
+            rm -rf reports/allure
+            mkdir -p reports/allure
           fi
 
-      # 🔹 Prepare publish folder
+      # 🔹 Prepare publish folder safely
       - name: Prepare publish folder
         if: always()
         run: |
           rm -rf publish
           mkdir -p publish/allure
-          cp -r reports/allure/* publish/allure/
+          if [ -d "reports/allure" ] && [ "$(ls -A reports/allure)" ]; then
+            cp -r reports/allure/* publish/allure/
+            echo "✅ Allure reports copied successfully."
+          else
+            echo "⚠️ No Allure reports to copy."
+          fi
           cat <<EOF > publish/index.html
           <!DOCTYPE html>
           <html>
@@ -94,6 +104,6 @@ jobs:
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
           echo "=============================================="
-          echo "🎯 Allure Report:"
+          echo "🎯 Allure Report URL:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
           echo "=============================================="
