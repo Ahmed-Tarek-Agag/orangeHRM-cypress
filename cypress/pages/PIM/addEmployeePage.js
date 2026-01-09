@@ -11,6 +11,7 @@ class addEmployeePage {
         passwordInput: () => cy.contains('label', 'Password').parents('.oxd-input-group').find('input'),
         confirmPasswordInput: () => cy.contains('label', 'Confirm Password').parents('.oxd-input-group').find('input'),
         saveButton: () => cy.contains('button', 'Save'),
+        toasterMessage: () => cy.get('#oxd-toaster_1'),
     };
 
     fillEmployeeDetails(firstName, middleName, lastName, employeeID, fileAttachment) {
@@ -28,6 +29,7 @@ class addEmployeePage {
         this.elements.passwordInput().type(password);
         this.elements.confirmPasswordInput().type(confirmPassword);
         this.elements.saveButton().click();
+        this.elements.toasterMessage().should('be.visible').and('contain.text', 'Successfully Saved');
         cy.url().should('include', '/pim/viewPersonalDetails')
     }
 }
