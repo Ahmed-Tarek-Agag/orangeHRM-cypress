@@ -35,13 +35,12 @@ jobs:
           npm run cypress:clean
           mkdir -p reports/allure
 
-      # 🔹 Run Cypress tests (job fails if test fails)
+      # 🔹 Run Cypress tests
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
           config: baseUrl=https://opensource-demo.orangehrmlive.com
-        # ❌ احذف continue-on-error عشان أي فشل يوقف الـ job
 
       # 🔹 Generate Allure Report
       - name: Generate Allure Report
@@ -50,16 +49,19 @@ jobs:
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
             npm run allure:generate
             # انقلها في مجلد reports/allure
-            mv allure-report/* reports/allure/
+            mv allure-report reports/allure
           else
             echo "No Allure results found"
           fi
 
-      # 🔹 Create main landing page
-      - name: Create main index.html
+      # 🔹 Prepare publish folder
+      - name: Prepare publish folder
         if: always()
         run: |
-          cat <<EOF > reports/index.html
+          rm -rf publish
+          mkdir -p publish/allure
+          cp -r reports/allure/* publish/allure/
+          cat <<EOF > publish/index.html
           <!DOCTYPE html>
           <html>
           <head>
@@ -82,7 +84,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./reports
+          publish_dir: ./publish
           publish_branch: gh-pages
 
       # 🔹 Print Report URL
