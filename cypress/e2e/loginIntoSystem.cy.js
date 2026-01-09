@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import { onLoginPage } from "../../pages/loginPage";
+import { onLoginPage } from "../pages/loginPage";
 
 beforeEach("Open Application", () => {
     cy.visit("/")

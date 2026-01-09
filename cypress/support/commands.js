@@ -23,3 +23,14 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+import { onLoginPage } from "../pages/loginPage"
+Cypress.Commands.add('login', () => {
+  cy.session('orangeHRM-session', () => {
+    cy.visit(Cypress.env('routes').login);
+
+    onLoginPage.loginIntoApp(Cypress.env('username'), Cypress.env('password'));
+
+    cy.url().should('include', Cypress.env('routes').dashboard);
+  });
+});
+

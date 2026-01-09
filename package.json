@@ -12,8 +12,10 @@
     "cypress": "^15.8.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.2.0",
     "@shelex/cypress-allure-plugin": "^2.41.2",
     "allure-commandline": "^2.36.0",
+    "cypress-file-upload": "^5.0.8",
     "fs-extra": "^11.3.3",
     "rimraf": "^6.1.2"
   }

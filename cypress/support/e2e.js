@@ -16,6 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import '@shelex/cypress-allure-plugin';
+import 'cypress-file-upload';
 const allureWriter = require('@shelex/cypress-allure-plugin/writer');
 
 module.exports = (on, config) => {
@@ -25,3 +26,4 @@ module.exports = (on, config) => {
 
   return config;
 };
+

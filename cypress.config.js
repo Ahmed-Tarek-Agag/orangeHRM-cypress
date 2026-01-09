@@ -28,8 +28,18 @@ module.exports = defineConfig({
   video: true,
   viewportWidth: 1280,
   viewportHeight: 720,
+  defaultCommandTimeout: 100000,
+  pageLoadTimeout: 60000,
   env: {
     allure: true
+  },
+  env: {
+    routes: {
+      login: '/web/index.php/auth/login',
+      dashboard: '/web/index.php/dashboard/index',
+      pim: '/web/index.php/pim/viewEmployeeList'
+    }
   }
+
 });
 
