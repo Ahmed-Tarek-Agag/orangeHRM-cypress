@@ -22,5 +22,14 @@ export const routesHelper = {
     `/web/index.php/pim/viewJobDetails/empNumber/${empNumber}`,
 
   salary: (empNumber) =>
-    `/web/index.php/pim/viewSalaryList/empNumber/${empNumber}`
+    `/web/index.php/pim/viewSalaryList/empNumber/${empNumber}`,
+
+  reportTo: (empNumber) =>
+    `/web/index.php/pim/viewReportToDetails/empNumber/${empNumber}`,
+
+  qualifications: (empNumber) =>
+    `/web/index.php/pim/viewQualifications/empNumber/${empNumber}`,
+
+  memberships: (empNumber) =>
+    `/web/index.php/pim/viewMemberships/empNumber/${empNumber}`
 };

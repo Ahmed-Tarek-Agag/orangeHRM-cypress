@@ -11,6 +11,9 @@ import { onDependentsPage } from '../pages/PIM/dependentsPage';
 import { onImmigrationPage } from '../pages/PIM/immigrationPage';
 import { onJobPage } from '../pages/PIM/jobPage';
 import { onSalaryPage } from '../pages/PIM/salaryPage';
+import { onReportToPage } from '../pages/PIM/reportToPage'; 
+import { onQualificationsPage } from '../pages/PIM/qualificationsPage';
+import { onMembershipsPage } from '../pages/PIM/membershipsPage';
 
 const randomPhone = () => {
     const n = faker.number.int({ min: 1000000000, max: 9999999999 });
@@ -79,6 +82,33 @@ const accountNumber = faker.finance.accountNumber(10);
 const routingNumber = faker.finance.routingNumber();
 const directDepositAmount = faker.number.int({ min: 1000, max: 5000 }).toString();
 
+// Generate random data for Report To page 
+const supervisorName = 'a';
+
+// Generate random data for Qualifications
+// Work Experience
+const companyName = faker.company.name();
+const jobTitle = faker.company.name();
+const fromDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+const toDate = faker.date.recent().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+// Education
+const instituteName = faker.company.name();
+const major = faker.company.name();
+const graduationYear =  faker.number.int({ min: 2000, max: 2025 }).toString();
+const jpaScore = (Math.random() * (4.0 - 2.0) + 2.0).toFixed(2).toString();
+const startDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+const endDate = faker.date.recent().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+// Skills
+const yearsOfExperience = faker.number.int({ min: 1, max: 10 }).toString();
+// Licenses
+const licenceNumber = faker.string.alphanumeric(10);
+const issuedDateForLicense = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+const expiryDateForLicense = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+// Generate random data for Memberships
+const subscriptionAmount = faker.number.int({ min: 100, max: 1000 }).toString();
+const commenceDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+const renewalDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
 
 
@@ -303,6 +333,95 @@ describe('PIM Users Management', () => {
             commentText
         );
         onSalaryPage.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.downloadAttachment();
+        onGeneralMethods.deleteAddedRecord();
+    });
+
+    it('Should navigate to Report To and assign a supervisor', () => {
+        cy.visit(routesHelper.reportTo(employeeNumber), { failOnStatusCode: false });
+        onReportToPage.assignSupervisor(
+            supervisorName,
+            1
+        );
+        onReportToPage.deleteSupervisor();
+        onReportToPage.uploadAttachment(
+            attachmentFilePath,
+            commentText
+        );
+        onReportToPage.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.downloadAttachment();
+        onGeneralMethods.deleteAddedRecord();
+    });
+
+    it('Should navigate to Qualifications and add qualification records', () => {
+        cy.visit(routesHelper.qualifications(employeeNumber), { failOnStatusCode: false });
+        onQualificationsPage.addWorkExperience(
+            companyName,
+            jobTitle,
+            fromDate,
+            toDate,
+            commentText
+        );
+        onQualificationsPage.deleteworkExperienceRecord();   
+        // onQualificationsPage.addEducation(
+        //     3,
+        //     instituteName,
+        //     major,
+        //     graduationYear,
+        //     jpaScore,
+        //     startDate,
+        //     endDate,
+        //     commentText
+        // );
+        // onQualificationsPage.deleteEducationRecord();   
+        onQualificationsPage.addSkill(
+            4,
+            yearsOfExperience,
+            commentText
+        );
+        onQualificationsPage.deleteSkillRecord();   
+        onQualificationsPage.addLanguage(
+            2, 
+            3,
+            1,
+            commentText 
+        );
+        onQualificationsPage.deleteLanguageRecord();   
+        onQualificationsPage.addLicense(
+            5,
+            licenceNumber,
+            issuedDateForLicense,
+            expiryDateForLicense
+        );
+        onQualificationsPage.deleteLicenseRecord(); 
+        onQualificationsPage.uploadAttachment(
+            attachmentFilePath,
+            commentText
+        );
+        onQualificationsPage.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.downloadAttachment();
+        onGeneralMethods.deleteAddedRecord();
+    }); 
+
+    it('Should navigate to Memberships and add membership records', () => {
+        cy.visit(routesHelper.memberships(employeeNumber), { failOnStatusCode: false });
+        onMembershipsPage.addMembership(
+            3,
+            1,
+            subscriptionAmount, 
+            1,
+            commenceDate,
+            renewalDate
+        );
+        onMembershipsPage.deleteMembershipRecord(); 
+        onMembershipsPage.uploadAttachment(
+            attachmentFilePath,
+            commentText
+        );
+        onMembershipsPage.assertOnDescriptionOnAttachment(commentText);
         onGeneralMethods.editAddedAttachment(commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
