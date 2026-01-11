@@ -31,7 +31,7 @@ module.exports = defineConfig({
   defaultCommandTimeout: 100000,
   pageLoadTimeout: 60000,
 
-  // 🔥 ENV واحد فقط
+
   env: {
     allure: true,
     routes: {
@@ -39,5 +39,12 @@ module.exports = defineConfig({
       dashboard: '/web/index.php/dashboard/index',
       pim: '/web/index.php/pim/viewEmployeeList'
     }
-  }
+  },
+  reporter: "mochawesome",
+  reporterOptions: {
+    reportDir: "cypress/reports/mochawesome",
+    overwrite: false,
+    html: false,
+    json: true,
+  },
 });

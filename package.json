@@ -6,7 +6,10 @@
     "cypress:run": "npx cypress run",
     "cypress:run:all": "npm run cypress:clean && npm run cypress:run && npm run allure:generate",
     "allure:generate": "npx allure generate allure-results --clean -o allure-report",
-    "allure:open": "npx allure open allure-report"
+    "allure:open": "npx allure open allure-report",
+    "mocha:merge": "npx mochawesome-merge cypress/reports/mochawesome/*.json > mochawesome.json",
+    "mocha:report": "npx marge mochawesome.json -f mochawesome-report -o mochawesome-report",
+    "test:report": "npm run cypress:run && npm run mocha:merge && npm run mocha:report"
   },
   "dependencies": {
     "cypress": "^15.8.1"
@@ -17,6 +20,9 @@
     "allure-commandline": "^2.36.0",
     "cypress-file-upload": "^5.0.8",
     "fs-extra": "^11.3.3",
+    "mochawesome": "^7.1.4",
+    "mochawesome-merge": "^5.1.0",
+    "mochawesome-report-generator": "^6.3.2",
     "rimraf": "^6.1.2"
   }
 }

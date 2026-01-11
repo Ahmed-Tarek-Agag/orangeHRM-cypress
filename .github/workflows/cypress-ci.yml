@@ -29,13 +29,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 🔹 Clean old Allure reports
+      # 🔹 Clean old reports
       - name: Clean old reports
         run: |
           npm run cypress:clean
+          rm -rf mochawesome-report mochawesome.json
           mkdir -p reports/allure
 
-      # 🔹 Run Cypress tests
+      # 🔹 Run Cypress tests (مرة واحدة بس)
       - name: Run Cypress tests
         run: npm run cypress:run
 
@@ -48,10 +49,23 @@ jobs:
           if [ -d "allure-results" ] && [ "$(ls -A allure-results)" ]; then
             echo "Generating Allure Report..."
             npm run allure:generate
-            mv allure-report/* reports/allure/ 2>/dev/null || echo "⚠️ No files generated"
-            echo "✅ Allure Report generated successfully."
+            mv allure-report/* reports/allure/
+            echo "✅ Allure Report generated."
           else
-            echo "⚠️ No Allure results found. Skipping report generation."
+            echo "⚠️ No Allure results found."
+          fi
+
+      # 🔹 Generate Mochawesome Report
+      - name: Generate Mochawesome Report
+        if: always()
+        run: |
+          if [ -d "cypress/reports/mochawesome" ] && [ "$(ls -A cypress/reports/mochawesome)" ]; then
+            echo "Generating Mochawesome Report..."
+            npm run mocha:merge
+            npm run mocha:report
+            echo "✅ Mochawesome Report generated."
+          else
+            echo "⚠️ No Mochawesome results found."
           fi
 
       # 🔹 Prepare publish folder
@@ -59,17 +73,30 @@ jobs:
         if: always()
         run: |
           rm -rf publish
-          mkdir -p publish/allure
-          if [ -d "reports/allure" ] && [ "$(ls -A reports/allure)" ]; then
+          mkdir -p publish/allure publish/mochawesome
+
+          if [ -d "reports/allure" ]; then
             cp -r reports/allure/* publish/allure/
           fi
+
+          if [ -d "mochawesome-report" ]; then
+            cp -r mochawesome-report/* publish/mochawesome/
+          fi
+
           cat <<EOF > publish/index.html
           <!DOCTYPE html>
           <html>
-          <head><title>Cypress Reports</title></head>
+          <head>
+            <title>Cypress Reports</title>
+            <style>
+              body { font-family: Arial; text-align: center; margin-top: 50px; }
+              a { display: block; margin: 20px; font-size: 22px; }
+            </style>
+          </head>
           <body>
             <h1>🚀 Cypress Test Reports</h1>
-            <a href="./allure/index.html">Allure Report</a>
+            <a href="./allure/index.html">✨ Allure Report</a>
+            <a href="./mochawesome/mochawesome-report.html">📊 Mochawesome Report</a>
           </body>
           </html>
           EOF
@@ -83,10 +110,15 @@ jobs:
           publish_dir: ./publish
           publish_branch: gh-pages
 
-      # 🔹 Print Report URL
-      - name: Print report URL
+      # 🔹 Print Report URLs
+      - name: Print report URLs
         if: always()
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
+          echo "======================================"
+          echo "🔗 Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
+          echo "🔗 Mochawesome Report:"
+          echo "https://${USER_NAME}.github.io/${REPO_NAME}/mochawesome/mochawesome-report.html"
+          echo "======================================"
