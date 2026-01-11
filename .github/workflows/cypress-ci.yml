@@ -118,7 +118,7 @@ jobs:
           REPO_NAME=${GITHUB_REPOSITORY#*/}
            echo "======================================"
           echo "🔗 Cypress Test Reports"
-          echo "https://USERNAME.github.io/REPO_NAME/"
+          echo "https://${USERNAME}.github.io/${REPO_NAME}/"
           echo "======================================"
           echo "🔗 Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"

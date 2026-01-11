@@ -14,103 +14,17 @@ import { onSalaryPage } from '../pages/PIM/salaryPage';
 import { onReportToPage } from '../pages/PIM/reportToPage'; 
 import { onQualificationsPage } from '../pages/PIM/qualificationsPage';
 import { onMembershipsPage } from '../pages/PIM/membershipsPage';
+import { generateEmployeeData } from '../support/dataFactory/employeeData';
 
-const randomPhone = () => {
-    const n = faker.number.int({ min: 1000000000, max: 9999999999 });
-    return n.toString().replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-}
+const data = generateEmployeeData();
+const {employee, personalDetails, contactDetails, emergencyContacts, dependents, immigration, jobDetails, salaryDetails, reportTo, qualifications, membership, salary} = data;
+
 
 // Attachments file paths
 const attachmentFilePath = 'cypress/fixtures/files/TestPDF.pdf';
 const profileImagePath = 'cypress/fixtures/files/profileImage.jpg';
 
-// Generate random data for the new employee
-const firstName = faker.person.firstName();
-const middleName = faker.person.middleName();
-const lastName = faker.person.lastName();
-const employeeID = faker.number.int({ min: 1000, max: 9999 }).toString();
-const fullName = `${firstName} ${lastName}`;
-const username = faker.internet.username({ firstName, lastName });
-const password = faker.internet.password({ length: 8 }) + "A1!";
-
-// Generate random data for personal details
-const otherID = faker.string.alphanumeric(8);
-const driverLicense = faker.string.alphanumeric(10);
-const dateOfBirth = faker.date.birthdate().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const licenseExpiryDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const testField = faker.word.noun();
-const commentText = faker.lorem.sentence();
-
-// Genereate random data for contact details
-const streetOne = faker.location.streetAddress();
-const streetTwo = faker.location.secondaryAddress();
-const city = faker.location.city();
-const state = faker.location.state();
-const zipCode = faker.location.zipCode();
-const homeTelephone = randomPhone();
-const mobile = randomPhone();
-const workTelephone = randomPhone();
-const workEmail = faker.internet.email();
-const otherEmail = faker.internet.email();
-
-// Generate random data for emergency contacts
-const emergencyContactName = faker.person.fullName();
-const relationship = 'Friend';
-
-// Generate random data for dependents
-const dependentName = faker.person.fullName();
-const dependentDateOfBirth = faker.date.birthdate().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-// Generate random data for immigration
-const immigrationNumber = faker.string.alphanumeric(12);
-const issuedDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const expiryDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const eligibleStatus = 'Citizen';
-const elligableDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-// Generate random data for job details
-const joinedDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const contractStartDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const contractEndDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const note = faker.lorem.sentence();
-const terminationDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD  
-
-// Generate random data for salary details
-const salaryComponent = 'Base Salary';
-const amount = Math.floor(Math.random() * (50000 - 40000 + 1)) + 40000;
-const accountNumber = faker.finance.accountNumber(10);
-const routingNumber = faker.finance.routingNumber();
-const directDepositAmount = faker.number.int({ min: 1000, max: 5000 }).toString();
-
-// Generate random data for Report To page 
-const supervisorName = 'a';
-
-// Generate random data for Qualifications
-// Work Experience
-const companyName = faker.company.name();
-const jobTitle = faker.company.name();
-const fromDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const toDate = faker.date.recent().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-// Education
-const instituteName = faker.company.name();
-const major = faker.company.name();
-const graduationYear =  faker.number.int({ min: 2000, max: 2025 }).toString();
-const jpaScore = (Math.random() * (4.0 - 2.0) + 2.0).toFixed(2).toString();
-const startDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const endDate = faker.date.recent().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-// Skills
-const yearsOfExperience = faker.number.int({ min: 1, max: 10 }).toString();
-// Licenses
-const licenceNumber = faker.string.alphanumeric(10);
-const issuedDateForLicense = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const expiryDateForLicense = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-// Generate random data for Memberships
-const subscriptionAmount = faker.number.int({ min: 100, max: 1000 }).toString();
-const commenceDate = faker.date.past().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-const renewalDate = faker.date.future().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-
+const fullName = `${employee.firstName} ${employee.lastName}`;
 
 let employeeNumber;
 describe('PIM Users Management', () => {
@@ -131,17 +45,17 @@ describe('PIM Users Management', () => {
         onNavigationToPages.navigateToPimPage();
 
         onAddEmployeePage.fillEmployeeDetails(
-            firstName,
-            middleName,
-            lastName,
-            employeeID,
+            employee.firstName,
+            employee.middleName,
+            employee.lastName,
+            employee.employeeID,
             profileImagePath
         );
 
         onAddEmployeePage.createLoginDetails(
-            username,
-            password,
-            password
+            employee.username,
+            employee.password,
+            employee.password
         );
 
         cy.url().then((url) => {
@@ -155,27 +69,27 @@ describe('PIM Users Management', () => {
     it('Should navigate to Personal Details of the created employee and complete personal details', () => {
         cy.visit(routesHelper.personalDetails(employeeNumber), { failOnStatusCode: false });
         onPersonalDetailsPage.fillPersonalDetails(
-            otherID,
-            driverLicense,
+            personalDetails.otherID,
+            personalDetails.driverLicense,
             5,
-            licenseExpiryDate,
+            personalDetails.licenseExpiryDate,
             2,
-            dateOfBirth
+            personalDetails.dateOfBirth
         );
 
         onPersonalDetailsPage.fillCustomFields(
             3,
-            testField
+            personalDetails.testField
         );
 
         onGeneralMethods.uploadAttachment(
             attachmentFilePath,
-            commentText
+            personalDetails.commentText
         );
 
-        onGeneralMethods.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.assertOnDescriptionOnAttachment(personalDetails.commentText);
 
-        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(personalDetails.commentText);
 
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
@@ -186,30 +100,30 @@ describe('PIM Users Management', () => {
         cy.visit(routesHelper.contactDetails(employeeNumber), { failOnStatusCode: false });
 
         onContactDetailsPage.fillAddressDetails(
-            streetOne,
-            streetTwo,
-            city,
-            state,
-            zipCode,
+            contactDetails.streetOne,
+            contactDetails.streetTwo,
+            contactDetails.city,
+            contactDetails.state,
+            contactDetails.zipCode,
             5
         );
         onContactDetailsPage.fillTelephoneDetails(
-            homeTelephone,
-            mobile,
-            workTelephone
+            contactDetails.homeTelephone,
+            contactDetails.mobile,
+            contactDetails.workTelephone
         );
         onContactDetailsPage.fillEmailDetails(
-            workEmail,
-            otherEmail
+            contactDetails.workEmail,
+            contactDetails.otherEmail
         );
         onGeneralMethods.uploadAttachment(
             attachmentFilePath,
-            commentText
+            contactDetails.commentText
         );
 
-        onGeneralMethods.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.assertOnDescriptionOnAttachment(contactDetails.commentText);
 
-        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(contactDetails.commentText);
 
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
@@ -219,23 +133,23 @@ describe('PIM Users Management', () => {
     it('Should navigate to Emergency Contacts and add an emergency contact', () => {
         cy.visit(routesHelper.emergencyContacts(employeeNumber), { failOnStatusCode: false });
         onEmergencyContactsPage.addEmergencyContact(
-            emergencyContactName,
-            relationship,
-            homeTelephone,
-            mobile,
-            workTelephone
+            emergencyContacts.emergencyContactName,
+            emergencyContacts.relationship,
+            emergencyContacts.homeTelephone,
+            emergencyContacts.mobile,
+            emergencyContacts.workTelephone
         );
 
-        onEmergencyContactsPage.deleteEmergencyContact(emergencyContactName);
+        onEmergencyContactsPage.deleteEmergencyContact(emergencyContacts.emergencyContactName);
 
         onEmergencyContactsPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            emergencyContacts.commentText
         );
 
-        onGeneralMethods.assertOnDescriptionOnAttachment(commentText);
+        onGeneralMethods.assertOnDescriptionOnAttachment(emergencyContacts.commentText);
 
-        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.editAddedAttachment(emergencyContacts.commentText);
 
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
@@ -245,17 +159,17 @@ describe('PIM Users Management', () => {
     it('Should navigate to Dependents and add a dependent', () => {
         cy.visit(routesHelper.dependents(employeeNumber), { failOnStatusCode: false });
         onDependentsPage.addDependent(
-            dependentName,
+            dependents.dependentName,
             1,
-            dependentDateOfBirth
+            dependents.dependentDateOfBirth
         );
         onDependentsPage.deleteDependent();
         onDependentsPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            dependents.commentText
         );
-        onDependentsPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onDependentsPage.assertOnDescriptionOnAttachment(dependents.commentText);
+        onGeneralMethods.editAddedAttachment(dependents.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     });
@@ -263,21 +177,21 @@ describe('PIM Users Management', () => {
     it('Should navigate to Immigration and add an immigration record', () => {
         cy.visit(routesHelper.immigration(employeeNumber), { failOnStatusCode: false });
         onImmigrationPage.addImmigrationRecord(
-            immigrationNumber,
-            issuedDate,
-            expiryDate,
-            eligibleStatus,
+            immigration.immigrationNumber,
+            immigration.issuedDate,
+            immigration.expiryDate,
+            immigration.eligibleStatus,
             10,
-            elligableDate,
-            commentText
+            immigration.elligableDate,
+            immigration.commentText
         );
         onImmigrationPage.deleteImmigrationRecord();
         onImmigrationPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            immigration.commentText
         );
-        onImmigrationPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onImmigrationPage.assertOnDescriptionOnAttachment(immigration.commentText);
+        onGeneralMethods.editAddedAttachment(immigration.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     });
@@ -285,29 +199,28 @@ describe('PIM Users Management', () => {
     it('Should navigate to Job and fill job details including termination', () => {
         cy.visit(routesHelper.job(employeeNumber), { failOnStatusCode: false });
         onJobPage.fillJobDetails(
-            joinedDate,
+            jobDetails.joinedDate,
             3,
             1,
             4,
             2,
             5,
-            contractStartDate,
-            contractEndDate,
+            jobDetails.contractStartDate,
+            jobDetails.contractEndDate,
             attachmentFilePath
         );
         onJobPage.terminateEmployment(
-            terminationDate,
+            jobDetails.terminationDate,
             2,
-            note
+            jobDetails.notes
         );
         onGeneralMethods.uploadAttachment(
             attachmentFilePath,
-            commentText
+            jobDetails.notes
         );
 
-        onGeneralMethods.assertOnDescriptionOnAttachment(commentText);
-
-        onGeneralMethods.editAddedAttachment(commentText);
+        onGeneralMethods.assertOnDescriptionOnAttachment(jobDetails.notes);
+        onGeneralMethods.editAddedAttachment(jobDetails.notes);
 
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
@@ -316,24 +229,24 @@ describe('PIM Users Management', () => {
     it('Should navigate to Salary and add salary details', () => {
         cy.visit(routesHelper.salary(employeeNumber), { failOnStatusCode: false });
         onSalaryPage.addSalaryDetails(
-            salaryComponent,
-            2,
+            salaryDetails.salaryComponent,
+            1,
             3,
             1,
-            amount.toString(),
-            commentText,
-            accountNumber,
+            salaryDetails.amount.toString(),
+            salaryDetails.commentText,
+            salaryDetails.accountNumber,
             2,
-            routingNumber,
-            directDepositAmount
+            salaryDetails.routingNumber,
+            salaryDetails.directDepositAmount
         );
         onSalaryPage.deleteAddedSalaryRecord();
         onSalaryPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            salaryDetails.commentText
         );
-        onSalaryPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onSalaryPage.assertOnDescriptionOnAttachment(salaryDetails.commentText);
+        onGeneralMethods.editAddedAttachment(salaryDetails.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     });
@@ -341,16 +254,16 @@ describe('PIM Users Management', () => {
     it('Should navigate to Report To and assign a supervisor', () => {
         cy.visit(routesHelper.reportTo(employeeNumber), { failOnStatusCode: false });
         onReportToPage.assignSupervisor(
-            supervisorName,
+            reportTo.supervisorName,
             1
         );
         onReportToPage.deleteSupervisor();
         onReportToPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            reportTo.commentText
         );
-        onReportToPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onReportToPage.assertOnDescriptionOnAttachment(reportTo.commentText);
+        onGeneralMethods.editAddedAttachment(reportTo.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     });
@@ -358,50 +271,50 @@ describe('PIM Users Management', () => {
     it('Should navigate to Qualifications and add qualification records', () => {
         cy.visit(routesHelper.qualifications(employeeNumber), { failOnStatusCode: false });
         onQualificationsPage.addWorkExperience(
-            companyName,
-            jobTitle,
-            fromDate,
-            toDate,
-            commentText
+            qualifications.companyName,
+            qualifications.jobTitle,
+            qualifications.fromDate,
+            qualifications.toDate,
+            qualifications.commentText
         );
         onQualificationsPage.deleteworkExperienceRecord();   
         // onQualificationsPage.addEducation(
         //     3,
-        //     instituteName,
-        //     major,
-        //     graduationYear,
-        //     jpaScore,
-        //     startDate,
-        //     endDate,
-        //     commentText
+        //     qualifications.instituteName,
+        //     qualifications.major,
+        //     qualifications.graduationYear,
+        //     qualifications.jpaScore,
+        //     qualifications.startDate,
+        //     qualifications.endDate,
+        //     qualifications.commentText
         // );
         // onQualificationsPage.deleteEducationRecord();   
         onQualificationsPage.addSkill(
             4,
-            yearsOfExperience,
-            commentText
+            qualifications.yearsOfExperience,
+            qualifications.commentText
         );
         onQualificationsPage.deleteSkillRecord();   
         onQualificationsPage.addLanguage(
             2, 
             3,
             1,
-            commentText 
+            qualifications.commentText
         );
         onQualificationsPage.deleteLanguageRecord();   
         onQualificationsPage.addLicense(
             5,
-            licenceNumber,
-            issuedDateForLicense,
-            expiryDateForLicense
+            qualifications.licenceNumber,
+            qualifications.issuedDateForLicense,
+            qualifications.expiryDateForLicense
         );
         onQualificationsPage.deleteLicenseRecord(); 
         onQualificationsPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            qualifications.commentText
         );
-        onQualificationsPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onQualificationsPage.assertOnDescriptionOnAttachment(qualifications.commentText);
+        onGeneralMethods.editAddedAttachment(qualifications.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     }); 
@@ -411,18 +324,18 @@ describe('PIM Users Management', () => {
         onMembershipsPage.addMembership(
             3,
             1,
-            subscriptionAmount, 
+            membership.subscriptionAmount, 
             1,
-            commenceDate,
-            renewalDate
+            membership.commenceDate,
+            membership.renewalDate
         );
         onMembershipsPage.deleteMembershipRecord(); 
         onMembershipsPage.uploadAttachment(
             attachmentFilePath,
-            commentText
+            membership.commentText
         );
-        onMembershipsPage.assertOnDescriptionOnAttachment(commentText);
-        onGeneralMethods.editAddedAttachment(commentText);
+        onMembershipsPage.assertOnDescriptionOnAttachment(membership.commentText);
+        onGeneralMethods.editAddedAttachment(membership.commentText);
         onGeneralMethods.downloadAttachment();
         onGeneralMethods.deleteAddedRecord();
     });
