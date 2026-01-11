@@ -116,6 +116,9 @@ jobs:
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
+           echo "======================================"
+          echo "🔗 Cypress Test Reports"
+          echo "https://USERNAME.github.io/REPO_NAME/"
           echo "======================================"
           echo "🔗 Allure Report:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
