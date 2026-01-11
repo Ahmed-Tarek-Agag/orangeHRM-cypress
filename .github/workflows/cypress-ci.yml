@@ -37,12 +37,9 @@ jobs:
 
       # 🔹 Run Cypress tests
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
-        with:
-          browser: chrome
-          config: baseUrl=https://opensource-demo.orangehrmlive.com
+        run: npm run cypress:run
 
-      # 🔹 Generate Allure Report safely
+      # 🔹 Generate Allure Report
       - name: Generate Allure Report
         if: always()
         run: |
@@ -57,7 +54,7 @@ jobs:
             echo "⚠️ No Allure results found. Skipping report generation."
           fi
 
-      # 🔹 Prepare publish folder safely
+      # 🔹 Prepare publish folder
       - name: Prepare publish folder
         if: always()
         run: |
@@ -65,28 +62,19 @@ jobs:
           mkdir -p publish/allure
           if [ -d "reports/allure" ] && [ "$(ls -A reports/allure)" ]; then
             cp -r reports/allure/* publish/allure/
-            echo "✅ Allure reports copied successfully."
-          else
-            echo "⚠️ No Allure reports to copy. Folder created empty."
           fi
           cat <<EOF > publish/index.html
           <!DOCTYPE html>
           <html>
-          <head>
-            <title>Cypress Test Reports</title>
-            <style>
-              body { font-family: Arial; text-align: center; margin-top: 50px; }
-              a { display: block; margin: 20px; font-size: 20px; text-decoration: none; }
-            </style>
-          </head>
+          <head><title>Cypress Reports</title></head>
           <body>
             <h1>🚀 Cypress Test Reports</h1>
-            <a href="./allure/index.html">✨ Allure Report</a>
+            <a href="./allure/index.html">Allure Report</a>
           </body>
           </html>
           EOF
 
-      # 🔹 Deploy Reports to GitHub Pages
+      # 🔹 Deploy to GitHub Pages
       - name: Deploy Reports to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
@@ -101,7 +89,4 @@ jobs:
         run: |
           USER_NAME=${GITHUB_REPOSITORY%%/*}
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          echo "=============================================="
-          echo "🎯 Allure Report URL:"
           echo "https://${USER_NAME}.github.io/${REPO_NAME}/allure/"
-          echo "=============================================="
