@@ -10,7 +10,7 @@ const { jobTitleDetails } = data;
 const attachmentFilePath = 'cypress/fixtures/files/TestPDF.pdf';
 
 
-describe('Admin - Job Titles - Add and Delete Job Title', () => {
+describe('Admin - Job Titles - Add , Edit and Delete Job Title', () => {
     before(() => {
         cy.login();
     });
