@@ -203,7 +203,7 @@ describe('PIM Users Management', () => {
             3,
             1,
             4,
-            2,
+            1,
             5,
             jobDetails.contractStartDate,
             jobDetails.contractEndDate,
@@ -230,7 +230,7 @@ describe('PIM Users Management', () => {
         cy.visit(routesHelper.salary(employeeNumber), { failOnStatusCode: false });
         onSalaryPage.addSalaryDetails(
             salaryDetails.salaryComponent,
-            1,
+            2,
             3,
             1,
             salaryDetails.amount.toString(),
