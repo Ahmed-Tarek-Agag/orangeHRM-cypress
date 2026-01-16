@@ -55,7 +55,7 @@ class employeeListPage {
 
             const recordsFromLabel = parseInt(match[0], 10);
 
-            // ✅ Assert label text فقط
+            // ✅ Assert label text 
             const expectedText =
                 recordsFromLabel === 1
                     ? `(1) Record Found`
@@ -64,7 +64,7 @@ class employeeListPage {
             this.elements.recordFoundLabel()
                 .should('contain.text', expectedText);
 
-            // ✅ Assert rows <= page size (مش =)
+            // ✅ Assert rows count
             this.elements.tableRows().then(rows => {
                 expect(rows.length).to.be.at.most(50);
                 expect(rows.length).to.be.greaterThan(0);
@@ -92,7 +92,6 @@ class employeeListPage {
             this.elements.searchButton().click({ force: true });
             cy.wait(1500);
 
-            // 🔹 حالة dropdown بدون column (Include)
             if (columnIndex === null) {
                 this.assertOnNumberOfRecordsFromLabel();
                 return;
@@ -128,12 +127,12 @@ class employeeListPage {
 
                     const nextBtn = $body.find('button.oxd-pagination-page-item--next');
 
-                    // 🔹 لا يوجد pagination أصلاً
+                    // ✅ No pagination
                     if (!nextBtn.length) {
                         return;
                     }
 
-                    // 🔹 آخر صفحة
+                    // ✅ Last page
                     if (nextBtn.is(':disabled')) {
                         return;
                     }
