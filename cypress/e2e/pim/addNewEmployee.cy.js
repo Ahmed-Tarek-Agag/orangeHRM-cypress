@@ -1,20 +1,20 @@
 /// <reference types="cypress" />
 import { faker } from '@faker-js/faker';
-import { routesHelper } from '../fixtures/routesHelper';
-import { onNavigationToPages } from '../pages/navigationToPages';
-import { onGeneralMethods } from '../pages/generalMethods';
-import { onAddEmployeePage } from "../pages/PIM/addEmployeePage";
-import { onPersonalDetailsPage } from '../pages/PIM/personalDetailsPage';
-import { onContactDetailsPage } from '../pages/PIM/contactDetailsPage';
-import { onEmergencyContactsPage } from '../pages/PIM/emergencyContactsPage';
-import { onDependentsPage } from '../pages/PIM/dependentsPage';
-import { onImmigrationPage } from '../pages/PIM/immigrationPage';
-import { onJobPage } from '../pages/PIM/jobPage';
-import { onSalaryPage } from '../pages/PIM/salaryPage';
-import { onReportToPage } from '../pages/PIM/reportToPage'; 
-import { onQualificationsPage } from '../pages/PIM/qualificationsPage';
-import { onMembershipsPage } from '../pages/PIM/membershipsPage';
-import { generateEmployeeData } from '../support/dataFactory/employeeData';
+import { routesHelper } from '../../fixtures/routesHelper';
+import { onNavigationToPages } from '../../pages/navigationToPages';
+import { onGeneralMethods } from '../../pages/generalMethods';
+import { onAddEmployeePage } from "../../pages/PIM/addEmployeePage";
+import { onPersonalDetailsPage } from '../../pages/PIM/personalDetailsPage';
+import { onContactDetailsPage } from '../../pages/PIM/contactDetailsPage';
+import { onEmergencyContactsPage } from '../../pages/PIM/emergencyContactsPage';
+import { onDependentsPage } from '../../pages/PIM/dependentsPage';
+import { onImmigrationPage } from '../../pages/PIM/immigrationPage';
+import { onJobPage } from '../../pages/PIM/jobPage';
+import { onSalaryPage } from '../../pages/PIM/salaryPage';
+import { onReportToPage } from '../../pages/PIM/reportToPage'; 
+import { onQualificationsPage } from '../../pages/PIM/qualificationsPage';
+import { onMembershipsPage } from '../../pages/PIM/membershipsPage';
+import { generateEmployeeData } from '../../support/dataFactory/employeeData';
 
 const data = generateEmployeeData();
 const {employee, personalDetails, contactDetails, emergencyContacts, dependents, immigration, jobDetails, salaryDetails, reportTo, qualifications, membership, salary} = data;

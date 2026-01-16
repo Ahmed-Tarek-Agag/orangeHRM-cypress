@@ -8,6 +8,8 @@ class generalMethods {
         }),
         toasterMessage: () => cy.get('#oxd-toaster_1'),
         deleteConfirmationButton: () => cy.contains('button', ' Yes, Delete '),
+        recordFoundLabel: () => cy.get('.orangehrm-vertical-padding'),
+        tableRows: () => cy.get('.oxd-table-body .oxd-table-card'),
     };
 
     uploadAttachment(filePath, comment) {
@@ -48,6 +50,24 @@ class generalMethods {
             this.elements.toasterMessage().should('be.visible').and('contain.text', 'Successfully Deleted');
         });
     }
+
+    // // Assertion Method to verify the searched Number of records from the label
+    // assertOnNumberOfRecordsFromLabel() {
+    //     this.elements.recordFoundLabel().invoke('text').then((text) => {
+    //         const match = text.match(/\d+/);
+    //         if (!match) {
+    //             cy.contains('No Records Found').should('be.visible');
+    //             this.elements.tableRows().should('have.length', 0);
+    //             return;
+    //         }
+    //         const recordsFromLabel = parseInt(text.match(/\d+/)[0]);
+    //         this.elements.tableRows().should('have.length', recordsFromLabel);
+    //         const expectedText = recordsFromLabel === 1
+    //             ? `(1) Record Found`
+    //             : `(${recordsFromLabel}) Records Found`;
+    //         this.elements.recordFoundLabel().should('contain.text', expectedText);
+    //     });
+    // }
 }
 
 export const onGeneralMethods = new generalMethods();

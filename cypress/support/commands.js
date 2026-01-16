@@ -34,3 +34,18 @@ Cypress.Commands.add('login', () => {
   });
 });
 
+
+Cypress.Commands.add('apiLogin', () => {
+  cy.request({
+    method: 'POST',
+    url: 'https://opensource-demo.orangehrmlive.com/web/index.php/auth/validate',
+    form: true, 
+    body: {
+      username: Cypress.env('username'),
+      password: Cypress.env('password')
+    }
+  }).then((response) => {
+    expect(response.status).to.eq(200)
+  })
+})
+
