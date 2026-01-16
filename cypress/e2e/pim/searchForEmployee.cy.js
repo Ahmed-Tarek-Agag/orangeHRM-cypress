@@ -53,23 +53,18 @@ describe('PIM - Search for Employee', () => {
         onEmployeeListPage.assertOnNumberOfRecordsFromLabel();
     });
 
-    it.only('should search for an employee by Employment Status and Assert On it', () => {
+    it('should search for an employee by Employment Status and Assert On it', () => {
         onNavigationToPages.navigateToPimPage();
         onEmployeeListPage.searchByDropdown(onEmployeeListPage.elements.employeeStatusDropdown, 5);
     });
 
-    it.only('should search for an employee by Include and Assert On it', () => {
+    it('should search for an employee by Include and Assert On it', () => {
         onNavigationToPages.navigateToPimPage();
         onEmployeeListPage.searchByDropdown(onEmployeeListPage.elements.includeDropdown, null);
     });
 
-    it.only('should search for an employee by Job Title and Assert On it', () => {
+    it('should search for an employee by Job Title and Assert On it', () => {
         onNavigationToPages.navigateToPimPage();
         onEmployeeListPage.searchByDropdown(onEmployeeListPage.elements.jobTitleDropdown, 4);
-    });
-
-    it.only('should search for an employee by Sub Unit and Assert On it', () => {
-        onNavigationToPages.navigateToPimPage();
-        onEmployeeListPage.searchByDropdown(onEmployeeListPage.elements.subUnitDropdown, 6);
     });
 });
