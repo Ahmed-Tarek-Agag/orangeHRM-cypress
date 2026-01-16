@@ -6,3 +6,6 @@ screenshots
 videos
 copilot-instructions.md
 mochawesome-report
+mochawesome.json
+cypress/videos
+cypress/screenshots
