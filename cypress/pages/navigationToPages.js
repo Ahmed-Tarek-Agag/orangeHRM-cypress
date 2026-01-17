@@ -27,5 +27,19 @@ class navigationToPages {
         cy.get('a').contains('Pay Grades').click();
         cy.url().should('include', '/admin/viewPayGrades');
     }
+
+    navigateToEmploymentStatusPage() {
+        this.navigateToAdminPage();
+        cy.get('nav').contains('Job').click();
+        cy.get('a').contains('Employment Status').click();
+        cy.url().should('include', '/admin/employmentStatus');
+    }
+
+    navigateToJobCategoriesPage() {
+        this.navigateToAdminPage();
+        cy.get('nav').contains('Job').click();
+        cy.get('a').contains('Job Categories').click();
+        cy.url().should('include', '/admin/jobCategory');
+    }
 }
 export const onNavigationToPages = new navigationToPages();

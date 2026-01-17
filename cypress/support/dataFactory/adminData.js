@@ -12,6 +12,12 @@ export const generateAdminData = () => {
             currencyIndex: 'USD - United States Dollar',
             minSalary: faker.number.int({ min: 1000, max: 5000 }),
             maxSalary: faker.number.int({ min: 5001, max: 10000 }),
-        }
+        },
+        employmentStatusDetails: {
+            name: faker.person.jobType(),
+        },
+        jobCategoryDetails: {
+            name: faker.person.jobTitle(),
+        },
     };
 }
