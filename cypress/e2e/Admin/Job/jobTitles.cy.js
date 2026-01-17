@@ -4,6 +4,7 @@ import { routesHelper } from "../../../fixtures/routesHelper";
 import { generateAdminData } from "../../../support/dataFactory/adminData";
 import { onJobTitlesPage } from "../../../pages/Admin/jobTitlesPage";
 import { onNavigationToPages } from "../../../pages/navigationToPages";
+import { onGeneralMethods } from "../../../pages/generalMethods";
 
 const data = generateAdminData();
 const { jobTitleDetails } = data;
@@ -19,14 +20,15 @@ describe('Admin - Job Titles - Add , Edit and Delete Job Title', () => {
         cy.visit(routesHelper.dashboard());
     });
 
-    it.only('Should add a new Job Title, Edit it, then delete it', () => {
-        onNavigationToPages.navigateToAdminPage();
+    it('Should add a new Job Title, Edit it, then delete it', () => {
+        onNavigationToPages.navigateToJobTitlesPage();
         onJobTitlesPage.addJobTitle(
             jobTitleDetails.title,
             jobTitleDetails.description,
             attachmentFilePath,
             jobTitleDetails.note
         );
+        onGeneralMethods.assertRecordsCountMatchesTable();
         onJobTitlesPage.assertJobTitleAdded(jobTitleDetails.title);
         onJobTitlesPage.updateAddedJobTitle(
             jobTitleDetails.title,
@@ -38,6 +40,7 @@ describe('Admin - Job Titles - Add , Edit and Delete Job Title', () => {
         );
         onJobTitlesPage.assertJobTitleAdded(`${jobTitleDetails.title} Updated`);
         onJobTitlesPage.deleteJobTitle(`${jobTitleDetails.title} Updated`);
+        onGeneralMethods.assertRecordsCountMatchesTable();
     });
 });
 

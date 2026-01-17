@@ -13,5 +13,19 @@ class navigationToPages {
         cy.contains('a', 'Admin').click();
         cy.url().should('include', '/admin');
     }
+
+    navigateToJobTitlesPage() {
+        this.navigateToAdminPage();
+        cy.get('nav').contains('Job').click();
+        cy.get('a').contains('Job Titles').click();
+        cy.url().should('include', '/admin/viewJobTitleList');
+    }
+
+    navigateToPayGradesPage() {
+        this.navigateToAdminPage();
+        cy.get('nav').contains('Job').click();
+        cy.get('a').contains('Pay Grades').click();
+        cy.url().should('include', '/admin/viewPayGrades');
+    }
 }
 export const onNavigationToPages = new navigationToPages();

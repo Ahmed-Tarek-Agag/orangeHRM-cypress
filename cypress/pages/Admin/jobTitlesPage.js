@@ -1,8 +1,11 @@
+import { th } from "@faker-js/faker";
+
 class jobTitlesPage {
     elements = {
-        jobListTab: () => cy.contains('.oxd-topbar-body-nav-tab-item', 'Job'),
-        jobTitleButton: () => cy.contains('a', 'Job Titles'),
+        jobTitlelabel: () => cy.get('h6').contains('Job Titles'),
         addJobTitleButton: () => cy.get('button').contains('Add'),
+        addJobTitleLabel: () => cy.get('h6').contains('Add Job Title'),
+        editJobTitleLabel: () => cy.get('h6').contains('Edit Job Title'),
         jobTitleInput: () => cy.contains('label', 'Job Title').parents('.oxd-input-group').find('input'),
         jobDescriptionTextarea: () => cy.contains('label', 'Job Description').parents('.oxd-input-group').find('textarea'),
         jobSpecificationUploadButton: () => cy.get('input[type="file"]'),
@@ -31,9 +34,9 @@ class jobTitlesPage {
 
 
     addJobTitle(jobTitle, jobDescription, jobSpecificationAttachment, note, isEdit = false) {
-        this.elements.jobListTab().click();
-        this.elements.jobTitleButton().click();
+        this.elements.jobTitlelabel().should('be.visible');
         this.elements.addJobTitleButton().click();
+        this.elements.addJobTitleLabel().should('be.visible');
         this.fillJobTitleForm(jobTitle, jobDescription, jobSpecificationAttachment, note , isEdit = false);
         this.elements.saveButton().click();
         this.elements.toasterMessage().should('be.visible').and('contain.text', 'Successfully Saved');
@@ -48,6 +51,7 @@ class jobTitlesPage {
             .within(() => {
                 cy.get('.oxd-table-cell').eq(3).find('button').eq(1).click(); // Click edit button
             });
+        this.elements.editJobTitleLabel().should('be.visible');
         this.fillJobTitleForm(newTitle, newDescription, attachmentFile, newNote, isEdit = true);
         this.elements.saveButton().click();
         this.elements.toasterMessage().should('be.visible').and('contain.text', 'Successfully Updated');

@@ -51,23 +51,31 @@ class generalMethods {
         });
     }
 
-    // // Assertion Method to verify the searched Number of records from the label
-    // assertOnNumberOfRecordsFromLabel() {
-    //     this.elements.recordFoundLabel().invoke('text').then((text) => {
-    //         const match = text.match(/\d+/);
-    //         if (!match) {
-    //             cy.contains('No Records Found').should('be.visible');
-    //             this.elements.tableRows().should('have.length', 0);
-    //             return;
-    //         }
-    //         const recordsFromLabel = parseInt(text.match(/\d+/)[0]);
-    //         this.elements.tableRows().should('have.length', recordsFromLabel);
-    //         const expectedText = recordsFromLabel === 1
-    //             ? `(1) Record Found`
-    //             : `(${recordsFromLabel}) Records Found`;
-    //         this.elements.recordFoundLabel().should('contain.text', expectedText);
-    //     });
-    // }
+    //Assertion Method to verify the Number of records from the label
+    assertRecordsCountMatchesTable() {
+        let actualRowCount = 0;
+        this.elements.tableRows().each(() => {
+            actualRowCount++;
+        }).then(() => {
+            this.elements.recordFoundLabel().invoke('text').then(text => {
+                if (text.includes('No Records Found')) {
+                    expect(actualRowCount).to.eq(0);
+                    return;
+                }
+                const match = text.match(/\d+/);
+                expect(match, 'Records number exists in label').to.not.be.null;
+
+                const recordsFromLabel = Number(match[0]);
+                expect(actualRowCount).to.eq(recordsFromLabel);
+                const expectedText = recordsFromLabel === 1
+                    ? `(1) Record Found`
+                    : `(${recordsFromLabel}) Records Found`;
+
+                expect(text.trim()).to.contain(expectedText);
+            });
+        });
+    }
+
 }
 
 export const onGeneralMethods = new generalMethods();
