@@ -1,7 +1,7 @@
 class loginPage {
     elements = {
-        usernameInput: () => cy.get('[placeholder="Username"]'),
-        passwordInput: () => cy.get('[placeholder="Password"]'),
+        usernameInput: () => cy.get('[placeholder="username"]'),
+        passwordInput: () => cy.get('[placeholder="password"]'),
         loginButton: () => cy.contains('button', 'Login'),
     };
 
