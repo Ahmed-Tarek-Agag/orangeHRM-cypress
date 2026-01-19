@@ -19,5 +19,30 @@ export const generateAdminData = () => {
         jobCategoryDetails: {
             name: faker.person.jobTitle(),
         },
+        workShiftDetails: {
+            name: faker.company.name(),
+            hoursInput: faker.number.int({ min: 1, max: 12 }).toString(),
+            minutesInput: faker.number.int({ min: 0, max: 59 }).toString(),
+            assignedEmployees: 'a',
+        },
+        skillsDetails: {
+            name: faker.hacker.noun(),
+            description: faker.lorem.sentence(),
+        },
+        educationDetails: {
+            name: faker.company.name(),
+        },
+        licenceDetails: {
+            name: faker.word.sample(),
+        },
+        languageDetails: {
+            name: faker.person.jobType(),
+        },
+        membershipDetails: {
+            name: faker.company.name(),
+        },
+        nationalityDetails: {
+            name: faker.location.country(),
+        },
     };
 }

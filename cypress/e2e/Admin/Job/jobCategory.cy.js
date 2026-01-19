@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 import { routesHelper } from "../../../fixtures/routesHelper";
 import { generateAdminData } from "../../../support/dataFactory/adminData";
-import { onJobCategoryPage  } from "../../../pages/Admin/jobCategories";
+import { onJobCategoryPage  } from "../../../pages/Admin/jobCategoriesPage";
 import { onNavigationToPages } from "../../../pages/navigationToPages";
 import { onGeneralMethods } from "../../../pages/generalMethods";
 const data = generateAdminData();
